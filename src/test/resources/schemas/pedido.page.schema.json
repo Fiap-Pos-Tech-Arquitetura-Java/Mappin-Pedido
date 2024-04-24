@@ -1,0 +1,183 @@
+
+
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "content": {
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "idUsuario": {
+              "type": "string"
+            },
+            "valorTotal": {
+              "type": "number"
+            },
+            "status": {
+              "type": "string"
+            },
+            "itens": {
+              "type": "array",
+              "items": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "idProduto": {
+                      "type": "string"
+                    },
+                    "quantidade": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "idProduto",
+                    "quantidade"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "idProduto": {
+                      "type": "string"
+                    },
+                    "quantidade": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "idProduto",
+                    "quantidade"
+                  ]
+                }
+              ]
+            }
+          },
+          "required": [
+            "id",
+            "idUsuario",
+            "valorTotal",
+            "status",
+            "itens"
+          ]
+        }
+      ]
+    },
+    "pageable": {
+      "type": "object",
+      "properties": {
+        "pageNumber": {
+          "type": "integer"
+        },
+        "pageSize": {
+          "type": "integer"
+        },
+        "sort": {
+          "type": "object",
+          "properties": {
+            "empty": {
+              "type": "boolean"
+            },
+            "sorted": {
+              "type": "boolean"
+            },
+            "unsorted": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "empty",
+            "sorted",
+            "unsorted"
+          ]
+        },
+        "offset": {
+          "type": "integer"
+        },
+        "paged": {
+          "type": "boolean"
+        },
+        "unpaged": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "pageNumber",
+        "pageSize",
+        "sort",
+        "offset",
+        "paged",
+        "unpaged"
+      ]
+    },
+    "last": {
+      "type": "boolean"
+    },
+    "totalPages": {
+      "type": "integer"
+    },
+    "totalElements": {
+      "type": "integer"
+    },
+    "first": {
+      "type": "boolean"
+    },
+    "numberOfElements": {
+      "type": "integer"
+    },
+    "size": {
+      "type": "integer"
+    },
+    "number": {
+      "type": "integer"
+    },
+    "sort": {
+      "type": "object",
+      "properties": {
+        "empty": {
+          "type": "boolean"
+        },
+        "sorted": {
+          "type": "boolean"
+        },
+        "unsorted": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "empty",
+        "sorted",
+        "unsorted"
+      ]
+    },
+    "empty": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "content",
+    "pageable",
+    "last",
+    "totalPages",
+    "totalElements",
+    "first",
+    "numberOfElements",
+    "size",
+    "number",
+    "sort",
+    "empty"
+  ]
+}
