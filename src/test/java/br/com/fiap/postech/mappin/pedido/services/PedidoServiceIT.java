@@ -2,12 +2,15 @@ package br.com.fiap.postech.mappin.pedido.services;
 
 import br.com.fiap.postech.mappin.pedido.entities.Pedido;
 import br.com.fiap.postech.mappin.pedido.helper.PedidoHelper;
+import br.com.fiap.postech.mappin.pedido.integration.ProdutoProducer;
+import br.com.fiap.postech.mappin.pedido.integration.ProdutoResponse;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
@@ -16,6 +19,8 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @AutoConfigureTestDatabase
@@ -24,6 +29,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 public class PedidoServiceIT {
     @Autowired
     private PedidoService pedidoService;
+    @MockBean
+    private ProdutoProducer produtoProducer;
 
     @Nested
     class CadastrarPedido {
@@ -31,6 +38,7 @@ public class PedidoServiceIT {
         void devePermitirCadastrarPedido() {
             // Arrange
             var pedido = PedidoHelper.getPedido(false);
+            when(produtoProducer.consultarValor(any(UUID.class))).thenReturn(new ProdutoResponse(Math.random() * 100));
             // Act
             var pedidoSalvo = pedidoService.save(pedido);
             // Assert

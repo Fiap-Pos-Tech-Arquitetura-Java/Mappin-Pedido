@@ -3,12 +3,15 @@ package br.com.fiap.postech.mappin.pedido.controller;
 import br.com.fiap.postech.mappin.pedido.entities.Item;
 import br.com.fiap.postech.mappin.pedido.entities.Pedido;
 import br.com.fiap.postech.mappin.pedido.helper.PedidoHelper;
+import br.com.fiap.postech.mappin.pedido.integration.ProdutoProducer;
+import br.com.fiap.postech.mappin.pedido.integration.ProdutoResponse;
 import io.restassured.RestAssured;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -20,6 +23,8 @@ import java.util.UUID;
 import static io.restassured.RestAssured.given;
 import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
 import static org.hamcrest.Matchers.equalTo;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureTestDatabase
@@ -29,6 +34,8 @@ public class PedidoControllerIT {
     public static final String PATH = "/mappin/pedido";
     @LocalServerPort
     private int port;
+    @MockBean
+    private ProdutoProducer produtoProducer;
 
     @BeforeEach
     void setup() {
@@ -41,14 +48,14 @@ public class PedidoControllerIT {
         @Test
         void devePermitirCadastrarPedido() {
             var pedido = PedidoHelper.getPedido(false);
+            when(produtoProducer.consultarValor(any(UUID.class))).thenReturn(new ProdutoResponse(Math.random() * 100));
             given()
                 .contentType(MediaType.APPLICATION_JSON_VALUE).body(pedido)
-            .when()
+            .when().log().all()
                 .post(PATH)
-            .then()
+            .then().log().all()
                 .statusCode(HttpStatus.CREATED.value())
                 .body(matchesJsonSchemaInClasspath("schemas/pedido.schema.json"));
-            // TODO VERIFICAR A OBRIGATORIEDADE DO ID
         }
 
         @Test
@@ -81,7 +88,6 @@ public class PedidoControllerIT {
             .then()
                 .statusCode(HttpStatus.OK.value())
                 .body(matchesJsonSchemaInClasspath("schemas/pedido.schema.json"));
-            // TODO VERIFICAR A OBRIGATORIEDADE DO ID
         }
         @Test
         void deveGerarExcecao_QuandoBuscarPedidoPorId_idNaoExiste() {

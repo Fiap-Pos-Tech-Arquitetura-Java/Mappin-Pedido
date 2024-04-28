@@ -11,8 +11,8 @@ public class PedidoHelper {
     public static Pedido getPedido(boolean geraId) {
         var pedido = new Pedido(
                 UUID.randomUUID(),
-                Math.random() * 1000,
-                "PENDENTE",
+                null,
+                null,
                 List.of(
                         new Item(UUID.randomUUID(),3),
                         new Item(UUID.randomUUID(),5)

@@ -2,6 +2,9 @@ package br.com.fiap.postech.mappin.pedido.services;
 
 import br.com.fiap.postech.mappin.pedido.entities.Pedido;
 import br.com.fiap.postech.mappin.pedido.helper.PedidoHelper;
+import br.com.fiap.postech.mappin.pedido.integration.ProdutoProducer;
+import br.com.fiap.postech.mappin.pedido.integration.ProdutoRequest;
+import br.com.fiap.postech.mappin.pedido.integration.ProdutoResponse;
 import br.com.fiap.postech.mappin.pedido.repository.PedidoRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,12 +32,15 @@ class PedidoServiceTest {
     @Mock
     private PedidoRepository pedidoRepository;
 
+    @Mock
+    private ProdutoProducer produtoProducer;
+
     private AutoCloseable mock;
 
     @BeforeEach
     void setUp() {
         mock = MockitoAnnotations.openMocks(this);
-        pedidoService = new PedidoServiceImpl(pedidoRepository);
+        pedidoService = new PedidoServiceImpl(pedidoRepository, produtoProducer);
     }
 
     @AfterEach
@@ -49,6 +55,7 @@ class PedidoServiceTest {
             // Arrange
             var pedido = PedidoHelper.getPedido(false);
             when(pedidoRepository.save(any(Pedido.class))).thenAnswer(r -> r.getArgument(0));
+            when(produtoProducer.consultarValor(any(UUID.class))).thenReturn(new ProdutoResponse(Math.random() * 100));
             // Act
             var pedidoSalvo = pedidoService.save(pedido);
             // Assert
@@ -60,6 +67,7 @@ class PedidoServiceTest {
             assertThat(pedidoSalvo.getStatus()).isEqualTo(pedido.getStatus());
             assertThat(pedidoSalvo.getId()).isNotNull();
             verify(pedidoRepository, times(1)).save(any(Pedido.class));
+            verify(produtoProducer, times(2)).consultarValor(any(UUID.class));
         }
 
         @Test
@@ -155,6 +163,36 @@ class PedidoServiceTest {
 
             verify(pedidoRepository, times(1)).findById(any(UUID.class));
             verify(pedidoRepository, times(1)).save(any(Pedido.class));
+            verify(produtoProducer, times(0)).consultarValor(any(UUID.class));
+        }
+
+        @Test
+        void devePermitirAlterarPedido_statusPagagmentoRealizado() {
+            // Arrange
+            var pedido = PedidoHelper.getPedido(true);
+            var pedidoReferencia = new Pedido(pedido.getIdUsuario(), pedido.getValorTotal(), pedido.getStatus(), pedido.getItens());
+            var novoPedido = new Pedido(
+                    pedido.getIdUsuario(),
+                    pedido.getValorTotal(),
+                    "PAGAMENTO_REALIZADO",
+                    pedido.getItens()
+            );
+            novoPedido.setId(pedido.getId());
+            when(pedidoRepository.findById(pedido.getId())).thenReturn(Optional.of(pedido));
+            when(pedidoRepository.save(any(Pedido.class))).thenAnswer(r -> r.getArgument(0));
+            // Act
+            var pedidoSalvo = pedidoService.update(pedido.getId(), novoPedido);
+            // Assert
+            assertThat(pedidoSalvo)
+                    .isInstanceOf(Pedido.class)
+                    .isNotNull();
+
+            assertThat(pedidoSalvo.getStatus()).isEqualTo(novoPedido.getStatus());
+            assertThat(pedidoSalvo.getStatus()).isNotEqualTo(pedidoReferencia.getStatus());
+
+            verify(pedidoRepository, times(1)).findById(any(UUID.class));
+            verify(pedidoRepository, times(1)).save(any(Pedido.class));
+            verify(produtoProducer, times(2)).removerDoEstoque(any(ProdutoRequest.class));
         }
 
         @Test
@@ -201,6 +239,7 @@ class PedidoServiceTest {
         void deveGerarExcecao_QuandoAlterarPedidoPorId_alterandoValorTotal() {
             // Arrange
             var pedido = PedidoHelper.getPedido(true);
+            pedido.setValorTotal(Math.random() * 100);
             var novoPedido = new Pedido(
                     pedido.getIdUsuario(),
                     pedido.getValorTotal() + 1,

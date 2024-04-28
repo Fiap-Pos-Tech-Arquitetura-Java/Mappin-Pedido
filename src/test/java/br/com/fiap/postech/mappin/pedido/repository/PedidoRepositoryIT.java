@@ -1,6 +1,7 @@
 package br.com.fiap.postech.mappin.pedido.repository;
 
 import br.com.fiap.postech.mappin.pedido.entities.Pedido;
+import br.com.fiap.postech.mappin.pedido.enumerations.Status;
 import br.com.fiap.postech.mappin.pedido.helper.PedidoHelper;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
@@ -31,6 +32,8 @@ public class PedidoRepositoryIT {
     void devePermitirCadastrarPedido() {
         // Arrange
         var pedido = PedidoHelper.getPedido(true);
+        pedido.setStatus(Status.AGUARDANDO_PAGAMENTO.name());
+        pedido.setValorTotal(1d);
         // Act
         var pedidoCadastrado = pedidoRepository.save(pedido);
         // Assert

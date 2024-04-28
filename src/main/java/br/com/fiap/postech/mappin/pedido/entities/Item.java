@@ -1,5 +1,6 @@
 package br.com.fiap.postech.mappin.pedido.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.Objects;
@@ -15,6 +16,9 @@ public class Item {
     private UUID idProduto;
     @Column(name = "quantidade", nullable = false)
     private Integer quantidade;
+    @JsonIgnore
+    @Transient
+    private Double valorProduto;
 
     public Item() {
         super();
@@ -59,5 +63,13 @@ public class Item {
 
     public void setQuantidade(Integer quantidade) {
         this.quantidade = quantidade;
+    }
+
+    public Double getValorProduto() {
+        return valorProduto;
+    }
+
+    public void setValorProduto(Double valorProduto) {
+        this.valorProduto = valorProduto;
     }
 }

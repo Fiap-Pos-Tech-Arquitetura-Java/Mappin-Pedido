@@ -1,5 +1,3 @@
-
-
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
   "type": "object",
@@ -43,25 +41,6 @@
                     "idProduto",
                     "quantidade"
                   ]
-                },
-                {
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "type": "string"
-                    },
-                    "idProduto": {
-                      "type": "string"
-                    },
-                    "quantidade": {
-                      "type": "integer"
-                    }
-                  },
-                  "required": [
-                    "id",
-                    "idProduto",
-                    "quantidade"
-                  ]
                 }
               ]
             }
@@ -86,23 +65,8 @@
           "type": "integer"
         },
         "sort": {
-          "type": "object",
-          "properties": {
-            "empty": {
-              "type": "boolean"
-            },
-            "sorted": {
-              "type": "boolean"
-            },
-            "unsorted": {
-              "type": "boolean"
-            }
-          },
-          "required": [
-            "empty",
-            "sorted",
-            "unsorted"
-          ]
+          "type": "array",
+          "items": {}
         },
         "offset": {
           "type": "integer"
@@ -126,16 +90,10 @@
     "last": {
       "type": "boolean"
     },
-    "totalPages": {
-      "type": "integer"
-    },
     "totalElements": {
       "type": "integer"
     },
-    "first": {
-      "type": "boolean"
-    },
-    "numberOfElements": {
+    "totalPages": {
       "type": "integer"
     },
     "size": {
@@ -145,23 +103,14 @@
       "type": "integer"
     },
     "sort": {
-      "type": "object",
-      "properties": {
-        "empty": {
-          "type": "boolean"
-        },
-        "sorted": {
-          "type": "boolean"
-        },
-        "unsorted": {
-          "type": "boolean"
-        }
-      },
-      "required": [
-        "empty",
-        "sorted",
-        "unsorted"
-      ]
+      "type": "array",
+      "items": {}
+    },
+    "first": {
+      "type": "boolean"
+    },
+    "numberOfElements": {
+      "type": "integer"
     },
     "empty": {
       "type": "boolean"
@@ -171,13 +120,13 @@
     "content",
     "pageable",
     "last",
-    "totalPages",
     "totalElements",
-    "first",
-    "numberOfElements",
+    "totalPages",
     "size",
     "number",
     "sort",
+    "first",
+    "numberOfElements",
     "empty"
   ]
 }
