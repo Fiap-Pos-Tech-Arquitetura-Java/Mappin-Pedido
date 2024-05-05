@@ -1,5 +1,5 @@
 insert into tb_pedido
-(id, id_usuario, valor_total, status)
+(id, id_cliente, valor_total, status)
 values
     ('a8c301d4-347f-4d1b-9171-c191b8aa0d88', '567c44cd-9441-4d88-9f43-54cc3655aaaf', 1999.99, 'PENDENTE'),
     ('d5b351c5-bc58-4c5c-8549-5113e7fea1ac', 'c0444933-ae73-43d9-b8a9-36eff4a79009', 250.83, 'PENDENTE'),

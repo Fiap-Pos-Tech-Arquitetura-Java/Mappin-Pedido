@@ -39,7 +39,7 @@ public class PedidoRepositoryIT {
         // Assert
         assertThat(pedidoCadastrado).isInstanceOf(Pedido.class).isNotNull();
         assertThat(pedidoCadastrado.getId()).isEqualTo(pedido.getId());
-        assertThat(pedidoCadastrado.getIdUsuario()).isEqualTo(pedido.getIdUsuario());
+        assertThat(pedidoCadastrado.getIdCliente()).isEqualTo(pedido.getIdCliente());
         assertThat(pedidoCadastrado.getStatus()).isEqualTo(pedido.getStatus());
         assertThat(pedidoCadastrado.getItens()).isNotNull();
         assertThat(pedidoCadastrado.getItens().get(0)).isEqualTo(pedido.getItens().get(0));

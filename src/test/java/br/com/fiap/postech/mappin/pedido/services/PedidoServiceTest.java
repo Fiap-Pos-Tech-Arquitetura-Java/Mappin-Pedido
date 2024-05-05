@@ -5,6 +5,7 @@ import br.com.fiap.postech.mappin.pedido.helper.PedidoHelper;
 import br.com.fiap.postech.mappin.pedido.integration.ProdutoProducer;
 import br.com.fiap.postech.mappin.pedido.integration.ProdutoRequest;
 import br.com.fiap.postech.mappin.pedido.integration.ProdutoResponse;
+import br.com.fiap.postech.mappin.pedido.integration.ClienteProducer;
 import br.com.fiap.postech.mappin.pedido.repository.PedidoRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,12 +36,15 @@ class PedidoServiceTest {
     @Mock
     private ProdutoProducer produtoProducer;
 
+    @Mock
+    private ClienteProducer clienteProducer;
+
     private AutoCloseable mock;
 
     @BeforeEach
     void setUp() {
         mock = MockitoAnnotations.openMocks(this);
-        pedidoService = new PedidoServiceImpl(pedidoRepository, produtoProducer);
+        pedidoService = new PedidoServiceImpl(pedidoRepository, produtoProducer, clienteProducer);
     }
 
     @AfterEach
@@ -62,7 +66,7 @@ class PedidoServiceTest {
             assertThat(pedidoSalvo)
                     .isInstanceOf(Pedido.class)
                     .isNotNull();
-            assertThat(pedidoSalvo.getIdUsuario()).isEqualTo(pedido.getIdUsuario());
+            assertThat(pedidoSalvo.getIdCliente()).isEqualTo(pedido.getIdCliente());
             assertThat(pedidoSalvo.getValorTotal()).isEqualTo(pedido.getValorTotal());
             assertThat(pedidoSalvo.getStatus()).isEqualTo(pedido.getStatus());
             assertThat(pedidoSalvo.getId()).isNotNull();
@@ -141,9 +145,9 @@ class PedidoServiceTest {
         void devePermitirAlterarPedido() {
             // Arrange
             var pedido = PedidoHelper.getPedido(true);
-            var pedidoReferencia = new Pedido(pedido.getIdUsuario(), pedido.getValorTotal(), pedido.getStatus(), pedido.getItens());
+            var pedidoReferencia = new Pedido(pedido.getIdCliente(), pedido.getValorTotal(), pedido.getStatus(), pedido.getItens());
             var novoPedido = new Pedido(
-                    pedido.getIdUsuario(),
+                    pedido.getIdCliente(),
                     pedido.getValorTotal(),
                     "AGUARDANDO ENTREGA",
                     pedido.getItens()
@@ -170,9 +174,9 @@ class PedidoServiceTest {
         void devePermitirAlterarPedido_statusPagagmentoRealizado() {
             // Arrange
             var pedido = PedidoHelper.getPedido(true);
-            var pedidoReferencia = new Pedido(pedido.getIdUsuario(), pedido.getValorTotal(), pedido.getStatus(), pedido.getItens());
+            var pedidoReferencia = new Pedido(pedido.getIdCliente(), pedido.getValorTotal(), pedido.getStatus(), pedido.getItens());
             var novoPedido = new Pedido(
-                    pedido.getIdUsuario(),
+                    pedido.getIdCliente(),
                     pedido.getValorTotal(),
                     "PAGAMENTO_REALIZADO",
                     pedido.getItens()
@@ -200,7 +204,7 @@ class PedidoServiceTest {
             // Arrange
             var pedido = PedidoHelper.getPedido(true);
             var novoPedido = new Pedido(
-                    pedido.getIdUsuario(),
+                    pedido.getIdCliente(),
                     pedido.getValorTotal(),
                     "AGUARDANDO ENTREGA",
                     pedido.getItens()
@@ -216,7 +220,7 @@ class PedidoServiceTest {
         }
 
         @Test
-        void deveGerarExcecao_QuandoAlterarPedidoPorId_alterandoUsuario() {
+        void deveGerarExcecao_QuandoAlterarPedidoPorId_alterandoCliente() {
             // Arrange
             var pedido = PedidoHelper.getPedido(true);
             var novoPedido = new Pedido(
@@ -241,7 +245,7 @@ class PedidoServiceTest {
             var pedido = PedidoHelper.getPedido(true);
             pedido.setValorTotal(Math.random() * 100);
             var novoPedido = new Pedido(
-                    pedido.getIdUsuario(),
+                    pedido.getIdCliente(),
                     pedido.getValorTotal() + 1,
                     "AGUARDANDO ENTREGA",
                     pedido.getItens()
@@ -262,7 +266,7 @@ class PedidoServiceTest {
             var pedido = PedidoHelper.getPedido(true);
             var pedidoItens = PedidoHelper.getPedido(true);
             var novoPedido = new Pedido(
-                    pedido.getIdUsuario(),
+                    pedido.getIdCliente(),
                     pedido.getValorTotal(),
                     "AGUARDANDO ENTREGA",
                     pedidoItens.getItens()

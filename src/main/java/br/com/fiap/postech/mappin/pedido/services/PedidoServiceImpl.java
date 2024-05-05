@@ -5,6 +5,7 @@ import br.com.fiap.postech.mappin.pedido.entities.Pedido;
 import br.com.fiap.postech.mappin.pedido.enumerations.Status;
 import br.com.fiap.postech.mappin.pedido.integration.ProdutoProducer;
 import br.com.fiap.postech.mappin.pedido.integration.ProdutoRequest;
+import br.com.fiap.postech.mappin.pedido.integration.ClienteProducer;
 import br.com.fiap.postech.mappin.pedido.repository.PedidoRepository;
 import io.micrometer.common.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,11 +22,13 @@ public class PedidoServiceImpl implements PedidoService {
     
     private final PedidoRepository pedidoRepository;
     private final ProdutoProducer produtoProducer;
+    private final ClienteProducer clienteProducer;
 
     @Autowired
-    public PedidoServiceImpl(PedidoRepository pedidoRepository, ProdutoProducer produtoProducer) {
+    public PedidoServiceImpl(PedidoRepository pedidoRepository, ProdutoProducer produtoProducer, ClienteProducer clienteProducer) {
         this.pedidoRepository = pedidoRepository;
         this.produtoProducer = produtoProducer;
+        this.clienteProducer = clienteProducer;
     }
 
     @Override
@@ -41,6 +44,7 @@ public class PedidoServiceImpl implements PedidoService {
         }
         pedido.setId(UUID.randomUUID());
         pedido.setStatus(Status.AGUARDANDO_PAGAMENTO.name());
+        clienteProducer.clienteExiste(pedido.getIdCliente());
         pedido.getItens().forEach(item -> {
             item.setId(UUID.randomUUID());
             var produtoResponse = produtoProducer.consultarValor(item.getIdProduto());
@@ -70,7 +74,7 @@ public class PedidoServiceImpl implements PedidoService {
         if (pedidoParam.getId() != null && !pedido.getId().equals(pedidoParam.getId())) {
             throw new IllegalArgumentException("Não é possível alterar o id de um pedido.");
         }
-        if (pedidoParam.getIdUsuario() != null && !pedido.getIdUsuario().equals(pedidoParam.getIdUsuario())) {
+        if (pedidoParam.getIdCliente() != null && !pedido.getIdCliente().equals(pedidoParam.getIdCliente())) {
             throw new IllegalArgumentException("Não é possível alterar o usuário de um pedido.");
         }
         if (pedidoParam.getValorTotal() != null && !pedido.getValorTotal().equals(pedidoParam.getValorTotal())) {

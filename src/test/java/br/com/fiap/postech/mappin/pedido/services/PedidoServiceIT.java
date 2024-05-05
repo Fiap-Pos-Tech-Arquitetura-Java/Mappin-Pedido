@@ -4,6 +4,7 @@ import br.com.fiap.postech.mappin.pedido.entities.Pedido;
 import br.com.fiap.postech.mappin.pedido.helper.PedidoHelper;
 import br.com.fiap.postech.mappin.pedido.integration.ProdutoProducer;
 import br.com.fiap.postech.mappin.pedido.integration.ProdutoResponse;
+import br.com.fiap.postech.mappin.pedido.integration.ClienteProducer;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -20,7 +21,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest
 @AutoConfigureTestDatabase
@@ -31,6 +32,8 @@ public class PedidoServiceIT {
     private PedidoService pedidoService;
     @MockBean
     private ProdutoProducer produtoProducer;
+    @MockBean
+    private ClienteProducer clienteProducer;
 
     @Nested
     class CadastrarPedido {
@@ -39,16 +42,26 @@ public class PedidoServiceIT {
             // Arrange
             var pedido = PedidoHelper.getPedido(false);
             when(produtoProducer.consultarValor(any(UUID.class))).thenReturn(new ProdutoResponse(Math.random() * 100));
+            doNothing().when(clienteProducer).clienteExiste(any(UUID.class));
             // Act
             var pedidoSalvo = pedidoService.save(pedido);
             // Assert
             assertThat(pedidoSalvo)
                     .isInstanceOf(Pedido.class)
                     .isNotNull();
-            assertThat(pedidoSalvo.getIdUsuario()).isEqualTo(pedido.getIdUsuario());
+            assertThat(pedidoSalvo.getIdCliente()).isEqualTo(pedido.getIdCliente());
             assertThat(pedidoSalvo.getValorTotal()).isEqualTo(pedido.getValorTotal());
             assertThat(pedidoSalvo.getStatus()).isEqualTo(pedido.getStatus());
             assertThat(pedidoSalvo.getId()).isNotNull();
+        }
+
+        @Test
+        void deveGerarExcecao_QuandoCadastrarPedido_comClienteInexistente() {
+            var pedido = PedidoHelper.getPedido(false);
+            doThrow(new IllegalArgumentException("Cliente não encontrado com o ID: " + pedido.getIdCliente())).when(clienteProducer).clienteExiste(any(UUID.class));
+            assertThatThrownBy(() -> pedidoService.save(pedido))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("Cliente não encontrado com o ID: " + pedido.getIdCliente());
         }
 
         @Test
@@ -69,12 +82,12 @@ public class PedidoServiceIT {
         void devePermitirBuscarPedidoPorId() {
             // Arrange
             var id = UUID.fromString("a8c301d4-347f-4d1b-9171-c191b8aa0d88");
-            var idUsuario = UUID.fromString("567c44cd-9441-4d88-9f43-54cc3655aaaf");
+            var idCliente = UUID.fromString("567c44cd-9441-4d88-9f43-54cc3655aaaf");
             // Act
             var pedidoObtido = pedidoService.findById(id);
             // Assert
             assertThat(pedidoObtido).isNotNull().isInstanceOf(Pedido.class);
-            assertThat(pedidoObtido.getIdUsuario()).isEqualTo(idUsuario);
+            assertThat(pedidoObtido.getIdCliente()).isEqualTo(idCliente);
             assertThat(pedidoObtido.getId()).isNotNull();
             assertThat(pedidoObtido.getId()).isEqualTo(id);
         }

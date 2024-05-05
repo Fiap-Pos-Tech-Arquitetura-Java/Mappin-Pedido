@@ -56,7 +56,7 @@ class PedidoRepositoryTest {
                 pedidoRecebido -> {
                     assertThat(pedidoRecebido).isInstanceOf(Pedido.class).isNotNull();
                     assertThat(pedidoRecebido.getId()).isEqualTo(pedido.getId());
-                    assertThat(pedidoRecebido.getIdUsuario()).isEqualTo(pedido.getIdUsuario());
+                    assertThat(pedidoRecebido.getIdCliente()).isEqualTo(pedido.getIdCliente());
                     assertThat(pedidoRecebido.getStatus()).isEqualTo(pedido.getStatus());
                     assertThat(pedidoRecebido.getItens()).isNotNull();
                     assertThat(pedidoRecebido.getItens().get(0)).isEqualTo(pedido.getItens().get(0));

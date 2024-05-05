@@ -7,7 +7,7 @@
     "id": {
       "type": "string"
     },
-    "idUsuario": {
+    "idCliente": {
       "type": "string"
     },
     "valorTotal": {
@@ -62,7 +62,7 @@
   },
   "required": [
     "id",
-    "idUsuario",
+    "idCliente",
     "valorTotal",
     "status",
     "itens"

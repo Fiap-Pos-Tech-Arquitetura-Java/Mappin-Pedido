@@ -12,8 +12,8 @@ public class Pedido {
     @Id
     @Column(name = "id", nullable = false)
     private UUID id;
-    @Column(name = "id_usuario", nullable = false)
-    private UUID idUsuario;
+    @Column(name = "id_cliente", nullable = false)
+    private UUID idCliente;
     @Column(name = "valor_total", nullable = false)
     private Double valorTotal;
     @Column(name = "status", nullable = false)
@@ -26,9 +26,9 @@ public class Pedido {
         super();
     }
 
-    public Pedido(UUID idUsuario, Double valorTotal, String status, List<Item> itens) {
+    public Pedido(UUID idCliente, Double valorTotal, String status, List<Item> itens) {
         this();
-        setIdUsuario(idUsuario);
+        setIdCliente(idCliente);
         setValorTotal(valorTotal);
         setStatus(status);
         setItens(itens);
@@ -54,12 +54,12 @@ public class Pedido {
         this.id = id;
     }
 
-    public UUID getIdUsuario() {
-        return idUsuario;
+    public UUID getIdCliente() {
+        return idCliente;
     }
 
-    public void setIdUsuario(UUID idUsuario) {
-        this.idUsuario = idUsuario;
+    public void setIdCliente(UUID idCliente) {
+        this.idCliente = idCliente;
     }
 
     public Double getValorTotal() {

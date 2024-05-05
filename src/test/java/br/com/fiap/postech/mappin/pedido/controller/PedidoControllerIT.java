@@ -5,6 +5,7 @@ import br.com.fiap.postech.mappin.pedido.entities.Pedido;
 import br.com.fiap.postech.mappin.pedido.helper.PedidoHelper;
 import br.com.fiap.postech.mappin.pedido.integration.ProdutoProducer;
 import br.com.fiap.postech.mappin.pedido.integration.ProdutoResponse;
+import br.com.fiap.postech.mappin.pedido.integration.ClienteProducer;
 import io.restassured.RestAssured;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -22,9 +23,10 @@ import java.util.UUID;
 
 import static io.restassured.RestAssured.given;
 import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureTestDatabase
@@ -36,6 +38,8 @@ public class PedidoControllerIT {
     private int port;
     @MockBean
     private ProdutoProducer produtoProducer;
+    @MockBean
+    private ClienteProducer clienteProducer;
 
     @BeforeEach
     void setup() {
@@ -49,13 +53,27 @@ public class PedidoControllerIT {
         void devePermitirCadastrarPedido() {
             var pedido = PedidoHelper.getPedido(false);
             when(produtoProducer.consultarValor(any(UUID.class))).thenReturn(new ProdutoResponse(Math.random() * 100));
+            doNothing().when(clienteProducer).clienteExiste(any(UUID.class));
             given()
                 .contentType(MediaType.APPLICATION_JSON_VALUE).body(pedido)
-            .when().log().all()
+            .when()
                 .post(PATH)
-            .then().log().all()
+            .then()
                 .statusCode(HttpStatus.CREATED.value())
                 .body(matchesJsonSchemaInClasspath("schemas/pedido.schema.json"));
+        }
+
+        @Test
+        void deveGerarExcecao_QuandoCadastrarPedido_comClienteInexistente() {
+            var pedido = PedidoHelper.getPedido(false);
+            doThrow(new IllegalArgumentException("Cliente não encontrado com o ID: " + pedido.getIdCliente())).when(clienteProducer).clienteExiste(any(UUID.class));
+            given()
+                    .contentType(MediaType.APPLICATION_JSON_VALUE)
+                    .when()
+                    .post(PATH)
+                    .then()
+                    .statusCode(HttpStatus.BAD_REQUEST.value())
+                    .body(matchesJsonSchemaInClasspath("schemas/error.schema.json"));
         }
 
         @Test
