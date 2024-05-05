@@ -1,6 +1,5 @@
-version : '3'
 services:
-  app:
+  mapping-pedido:
     image: 'mappin-pedido-docker-image'
     build:
       context: .
@@ -8,16 +7,24 @@ services:
     depends_on:
       - db
     ports:
-      - "8081:8080"
+      - "8082:8082"
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5434/mappin-pedido-db
       - SPRING_DATASOURCE_USERNAME=mappin
       - SPRING_DATASOURCE_PASSWORD=mappinPedido
       - SPRING_JPA_HIBERNATE_DDL_AUTO=create-drop
+    networks:
+      - mappin-network
   db:
     image: postgres:latest
     container_name: mappin-pedido-db
+    command: -p 5434
     environment:
       - POSTGRES_USER=mappin
       - POSTGRES_PASSWORD=mappinPedido
       - POSTGRES_DB=mappin-pedido-db
+    networks:
+      - mappin-network
+networks:
+  mappin-network:
+    external: true
