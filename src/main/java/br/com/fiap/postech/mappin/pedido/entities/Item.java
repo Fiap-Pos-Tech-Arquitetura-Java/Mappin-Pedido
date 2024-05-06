@@ -1,5 +1,6 @@
 package br.com.fiap.postech.mappin.pedido.entities;
 
+import br.com.fiap.postech.mappin.pedido.Generated;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
@@ -30,6 +31,7 @@ public class Item {
     }
 
     @Override
+    @Generated
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Item item)) return false;

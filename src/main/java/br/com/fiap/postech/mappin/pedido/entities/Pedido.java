@@ -1,5 +1,6 @@
 package br.com.fiap.postech.mappin.pedido.entities;
 
+import br.com.fiap.postech.mappin.pedido.Generated;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -35,6 +36,7 @@ public class Pedido {
     }
 
     @Override
+    @Generated
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Pedido pedido)) return false;

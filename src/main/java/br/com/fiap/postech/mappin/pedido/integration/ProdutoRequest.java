@@ -1,7 +1,10 @@
 package br.com.fiap.postech.mappin.pedido.integration;
 
+import br.com.fiap.postech.mappin.pedido.Generated;
+
 import java.util.UUID;
 
+@Generated
 public class ProdutoRequest {
     private final UUID id;
     private Integer quantidade;

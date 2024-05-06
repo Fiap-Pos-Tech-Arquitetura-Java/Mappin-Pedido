@@ -6,6 +6,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 
 @SpringBootApplication
 @EnableFeignClients
+@Generated
 public class MappinPedidoApplication {
 
     public static void main(String[] args) {

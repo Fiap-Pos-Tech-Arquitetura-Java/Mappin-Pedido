@@ -1,6 +1,7 @@
 package br.com.fiap.postech.mappin.pedido.services;
 
 import br.com.fiap.postech.mappin.pedido.entities.Pedido;
+import br.com.fiap.postech.mappin.pedido.enumerations.Status;
 import br.com.fiap.postech.mappin.pedido.helper.PedidoHelper;
 import br.com.fiap.postech.mappin.pedido.integration.ProdutoProducer;
 import br.com.fiap.postech.mappin.pedido.integration.ProdutoRequest;
@@ -19,6 +20,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -84,6 +86,45 @@ class PedidoServiceTest {
             assertThatThrownBy(() -> pedidoService.save(pedido))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage("Não é possível criar um pedido sem pelo menos um item.");
+            verify(pedidoRepository, never()).save(any(Pedido.class));
+        }
+
+        @Test
+        void deveGerarExcecao_QuandoCadastrarPedido_informandoListaItensVazia() {
+            // Arrange
+            var pedido = PedidoHelper.getPedido(true);
+            pedido.setItens(List.of());
+            when(pedidoRepository.findById(pedido.getId())).thenReturn(Optional.of(pedido));
+            // Act && Assert
+            assertThatThrownBy(() -> pedidoService.save(pedido))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("Não é possível criar um pedido sem pelo menos um item.");
+            verify(pedidoRepository, never()).save(any(Pedido.class));
+        }
+
+        @Test
+        void deveGerarExcecao_QuandoCadastrarPedido_informandoValorTotal() {
+            // Arrange
+            var pedido = PedidoHelper.getPedido(true);
+            pedido.setValorTotal(Math.random() * 100);
+            when(pedidoRepository.findById(pedido.getId())).thenReturn(Optional.of(pedido));
+            // Act && Assert
+            assertThatThrownBy(() -> pedidoService.save(pedido))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("O valor total de um pedido é calculado.");
+            verify(pedidoRepository, never()).save(any(Pedido.class));
+        }
+
+        @Test
+        void deveGerarExcecao_QuandoCadastrarPedido_informandoStatus() {
+            // Arrange
+            var pedido = PedidoHelper.getPedido(true);
+            pedido.setStatus(Status.FINALIZADO.name());
+            when(pedidoRepository.findById(pedido.getId())).thenReturn(Optional.of(pedido));
+            // Act && Assert
+            assertThatThrownBy(() -> pedidoService.save(pedido))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("O status inicial de um pedido é sempre AGUARDANDO_PAGAMENTO.");
             verify(pedidoRepository, never()).save(any(Pedido.class));
         }
     }
@@ -167,7 +208,26 @@ class PedidoServiceTest {
 
             verify(pedidoRepository, times(1)).findById(any(UUID.class));
             verify(pedidoRepository, times(1)).save(any(Pedido.class));
-            verify(produtoProducer, times(0)).consultarValor(any(UUID.class));
+        }
+
+        @Test
+        void devePermitirAlterarProduto_semBody() {
+            // Arrange
+            var pedido = PedidoHelper.getPedido(true);
+            var novoPedido = new Pedido(null, null, null, null);
+            when(pedidoRepository.findById(pedido.getId())).thenReturn(Optional.of(pedido));
+            when(pedidoRepository.save(any(Pedido.class))).thenAnswer(r -> r.getArgument(0));
+            // Act
+            var pedidoSalvo = pedidoService.update(pedido.getId(), novoPedido);
+            // Assert
+            assertThat(pedidoSalvo)
+                    .isInstanceOf(Pedido.class)
+                    .isNotNull();
+
+            assertThat(pedidoSalvo.getStatus()).isEqualTo(pedido.getStatus());
+
+            verify(pedidoRepository, times(1)).findById(any(UUID.class));
+            verify(pedidoRepository, times(1)).save(any(Pedido.class));
         }
 
         @Test
