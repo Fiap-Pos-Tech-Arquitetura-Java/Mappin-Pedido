@@ -15,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -63,6 +64,11 @@ public class PedidoServiceImpl implements PedidoService {
     }
 
     @Override
+    public List<Pedido> findByStatus(String status) {
+        return pedidoRepository.findByStatus(status).orElse(null);
+    }
+
+    @Override
     public Pedido findById(UUID id) {
         return pedidoRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Pedido não encontrado com o ID: " + id));
@@ -84,6 +90,9 @@ public class PedidoServiceImpl implements PedidoService {
             throw new IllegalArgumentException("Não é possível alterar os itens um pedido.");
         }
         if (StringUtils.isNotEmpty(pedidoParam.getStatus())) {
+            if (!Status.contains(pedidoParam.getStatus())) {
+                throw new IllegalArgumentException("Status " + pedidoParam.getStatus() + " não existe");
+            }
             pedido.setStatus(pedidoParam.getStatus());
         }
         if (Status.PAGAMENTO_REALIZADO.name().equals(pedido.getStatus())) {

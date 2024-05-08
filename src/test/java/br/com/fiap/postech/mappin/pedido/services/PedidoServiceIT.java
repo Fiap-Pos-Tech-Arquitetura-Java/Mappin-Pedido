@@ -1,6 +1,7 @@
 package br.com.fiap.postech.mappin.pedido.services;
 
 import br.com.fiap.postech.mappin.pedido.entities.Pedido;
+import br.com.fiap.postech.mappin.pedido.enumerations.Status;
 import br.com.fiap.postech.mappin.pedido.helper.PedidoHelper;
 import br.com.fiap.postech.mappin.pedido.integration.ProdutoProducer;
 import br.com.fiap.postech.mappin.pedido.integration.ProdutoResponse;
@@ -126,7 +127,7 @@ public class PedidoServiceIT {
         void devePermitirAlterarPedido() {
             // Arrange
             var id = UUID.fromString("d5b351c5-bc58-4c5c-8549-5113e7fea1ac");
-            var status = "FINALIZADO";
+            var status = Status.ENTREGUE.name();
 
             var pedido = new Pedido(null, null, status, null);
             pedido.setId(null);

@@ -119,7 +119,7 @@ class PedidoServiceTest {
         void deveGerarExcecao_QuandoCadastrarPedido_informandoStatus() {
             // Arrange
             var pedido = PedidoHelper.getPedido(true);
-            pedido.setStatus(Status.FINALIZADO.name());
+            pedido.setStatus(Status.ENTREGUE.name());
             when(pedidoRepository.findById(pedido.getId())).thenReturn(Optional.of(pedido));
             // Act && Assert
             assertThatThrownBy(() -> pedidoService.save(pedido))
@@ -190,7 +190,7 @@ class PedidoServiceTest {
             var novoPedido = new Pedido(
                     pedido.getIdCliente(),
                     pedido.getValorTotal(),
-                    "AGUARDANDO ENTREGA",
+                    Status.AGUARDANDO_ENTREGA.name(),
                     pedido.getItens()
             );
             novoPedido.setId(pedido.getId());
@@ -208,6 +208,11 @@ class PedidoServiceTest {
 
             verify(pedidoRepository, times(1)).findById(any(UUID.class));
             verify(pedidoRepository, times(1)).save(any(Pedido.class));
+        }
+
+        @Test
+        void deveGerarExcecao_QuandoAlterarPedidoPorId_alterandoStatusDesconhecido() {
+
         }
 
         @Test
@@ -266,7 +271,7 @@ class PedidoServiceTest {
             var novoPedido = new Pedido(
                     pedido.getIdCliente(),
                     pedido.getValorTotal(),
-                    "AGUARDANDO ENTREGA",
+                    Status.AGUARDANDO_ENTREGA.name(),
                     pedido.getItens()
             );
             novoPedido.setId(UUID.randomUUID());
@@ -286,7 +291,7 @@ class PedidoServiceTest {
             var novoPedido = new Pedido(
                     UUID.randomUUID(),
                     pedido.getValorTotal(),
-                    "AGUARDANDO ENTREGA",
+                    Status.AGUARDANDO_ENTREGA.name(),
                     pedido.getItens()
             );
             novoPedido.setId(pedido.getId());
@@ -307,7 +312,7 @@ class PedidoServiceTest {
             var novoPedido = new Pedido(
                     pedido.getIdCliente(),
                     pedido.getValorTotal() + 1,
-                    "AGUARDANDO ENTREGA",
+                    Status.AGUARDANDO_ENTREGA.name(),
                     pedido.getItens()
             );
             novoPedido.setId(pedido.getId());
@@ -328,7 +333,7 @@ class PedidoServiceTest {
             var novoPedido = new Pedido(
                     pedido.getIdCliente(),
                     pedido.getValorTotal(),
-                    "AGUARDANDO ENTREGA",
+                    Status.AGUARDANDO_ENTREGA.name(),
                     pedidoItens.getItens()
             );
             novoPedido.setId(pedido.getId());

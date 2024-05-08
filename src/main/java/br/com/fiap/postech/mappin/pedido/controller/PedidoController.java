@@ -12,6 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -44,6 +45,13 @@ public class PedidoController {
         pedido.setId(null);
         var pageable = PageRequest.of(page, size);
         var pedidos = pedidoService.findAll(pageable, pedido);
+        return new ResponseEntity<>(pedidos, HttpStatus.OK);
+    }
+
+    @Operation(summary = "lista todos os pedidos")
+    @GetMapping( path = "findByStatus/{status}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<Pedido>> findByStatus(@PathVariable String status) {
+        var pedidos = pedidoService.findByStatus(status);
         return new ResponseEntity<>(pedidos, HttpStatus.OK);
     }
 

@@ -4,12 +4,15 @@ import br.com.fiap.postech.mappin.pedido.entities.Pedido;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface PedidoService {
     Pedido save(Pedido pedido);
 
     Page<Pedido> findAll(Pageable pageable, Pedido pedido);
+
+    List<Pedido> findByStatus(String status);
 
     Pedido findById(UUID id);
 

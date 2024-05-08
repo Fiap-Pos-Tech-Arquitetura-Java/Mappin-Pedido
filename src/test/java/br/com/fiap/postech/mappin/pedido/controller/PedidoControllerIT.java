@@ -2,6 +2,7 @@ package br.com.fiap.postech.mappin.pedido.controller;
 
 import br.com.fiap.postech.mappin.pedido.entities.Item;
 import br.com.fiap.postech.mappin.pedido.entities.Pedido;
+import br.com.fiap.postech.mappin.pedido.enumerations.Status;
 import br.com.fiap.postech.mappin.pedido.helper.PedidoHelper;
 import br.com.fiap.postech.mappin.pedido.integration.ProdutoProducer;
 import br.com.fiap.postech.mappin.pedido.integration.ProdutoResponse;
@@ -158,7 +159,7 @@ public class PedidoControllerIT {
             var pedido = new Pedido(
                     UUID.fromString("c0444933-ae73-43d9-b8a9-36eff4a79009"),
                     250.83,
-                    "FINALIZADO",
+                    Status.ENTREGUE.name(),
                     itens
             );
             pedido.setId(UUID.fromString("d5b351c5-bc58-4c5c-8549-5113e7fea1ac"));
@@ -205,7 +206,7 @@ public class PedidoControllerIT {
             var pedido = new Pedido(
                     UUID.randomUUID(),
                     Math.random() * 1000,
-                    "FINALIZADO",
+                    Status.ENTREGUE.name(),
                     null
             );
             pedido.setId(UUID.fromString("90b91424-d7f4-4695-b5a8-e489232007b9"));
