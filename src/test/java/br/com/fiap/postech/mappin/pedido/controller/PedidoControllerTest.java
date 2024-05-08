@@ -1,6 +1,7 @@
 package br.com.fiap.postech.mappin.pedido.controller;
 
 import br.com.fiap.postech.mappin.pedido.entities.Pedido;
+import br.com.fiap.postech.mappin.pedido.enumerations.Status;
 import br.com.fiap.postech.mappin.pedido.helper.PedidoHelper;
 import br.com.fiap.postech.mappin.pedido.services.PedidoService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -139,6 +140,20 @@ class PedidoControllerTest {
             ;
             // Assert
             verify(pedidoService, times(1)).findAll(pageable, criterioPedido);
+        }
+
+        @Test
+        void devePermitirBuscarPedidoPorStatus() throws Exception {
+            // Arrange
+            String status = Status.ENTREGUE.name();
+            List<Pedido> pedidos = List.of(PedidoHelper.getPedido(true));
+            when(pedidoService.findByStatus(status)
+            ).thenReturn(pedidos);
+            // Act
+            mockMvc.perform(get("/pedido/findByStatus/{status}", status))
+                    .andExpect(status().isOk());
+            // Assert
+            verify(pedidoService, times(1)).findByStatus(anyString());
         }
     }
 

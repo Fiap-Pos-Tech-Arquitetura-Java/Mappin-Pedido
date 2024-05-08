@@ -178,6 +178,24 @@ class PedidoServiceTest {
             );
             verify(pedidoRepository, times(1)).findAll(any(Example.class), any(Pageable.class));
         }
+
+        @Test
+        void devePermitirBuscarPedidoPorStatus() {
+            // Arrange
+            String status = Status.ENTREGUE.name();
+            List<Pedido> pedidos = List.of(PedidoHelper.getPedido(true));
+            when(pedidoRepository.findByStatus(any(String.class))).thenReturn(Optional.of(pedidos));
+            // Act
+            var pedidosObtidos = pedidoService.findByStatus(status);
+            // Assert
+            assertThat(pedidosObtidos).hasSize(1);
+            assertThat(pedidosObtidos).allSatisfy(
+                    pedido -> assertThat(pedido)
+                            .isNotNull()
+                            .isInstanceOf(Pedido.class)
+            );
+            verify(pedidoRepository, times(1)).findByStatus(anyString());
+        }
     }
 
     @Nested
@@ -212,7 +230,21 @@ class PedidoServiceTest {
 
         @Test
         void deveGerarExcecao_QuandoAlterarPedidoPorId_alterandoStatusDesconhecido() {
-
+            // Arrange
+            var pedido = PedidoHelper.getPedido(true);
+            var novoPedido = new Pedido(
+                    pedido.getIdCliente(),
+                    pedido.getValorTotal(),
+                    Status.AGUARDANDO_ENTREGA.name() + "X",
+                    pedido.getItens()
+            );
+            when(pedidoRepository.findById(pedido.getId())).thenReturn(Optional.of(pedido));
+            // Act && Assert
+            assertThatThrownBy(() -> pedidoService.update(pedido.getId(), novoPedido))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("Status " + novoPedido.getStatus() + " não existe");
+            verify(pedidoRepository, times(1)).findById(any(UUID.class));
+            verify(pedidoRepository, never()).save(any(Pedido.class));
         }
 
         @Test
@@ -236,14 +268,14 @@ class PedidoServiceTest {
         }
 
         @Test
-        void devePermitirAlterarPedido_statusPagagmentoRealizado() {
+        void devePermitirAlterarPedido_statusPagamentoRealizado() {
             // Arrange
             var pedido = PedidoHelper.getPedido(true);
             var pedidoReferencia = new Pedido(pedido.getIdCliente(), pedido.getValorTotal(), pedido.getStatus(), pedido.getItens());
             var novoPedido = new Pedido(
                     pedido.getIdCliente(),
                     pedido.getValorTotal(),
-                    "PAGAMENTO_REALIZADO",
+                    Status.PAGAMENTO_REALIZADO.name(),
                     pedido.getItens()
             );
             novoPedido.setId(pedido.getId());
